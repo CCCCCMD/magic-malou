@@ -6,74 +6,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MQTT消息发送</title>
     <script src="./mqtt.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
+    <div class="container">
+        <h2 class="title">吗喽留言板</h2>
+        <h3 class="subTitle">🐒 咱们222个猴把日子过好比什么都重要 🐒</h3>
+        <div class="formContainer">
+            <div class="inputContainer">
+                <label class="formLabel" for="sender">🐵 你是哪个猴</label>
 
-    <h2>吗喽留言板</h2>
+                <input class="formInput" type="text" id="sender" placeholder="猴名">
+            </div>
 
-    <label for="sender">你是哪个猴：</label>
-    <input type="text" id="sender" placeholder="猴名">
+            <div class="inputContainer">
+                <label class="formLabel" for="message">🙈 消息</label>
+                <input class="formInput" type="text" id="message" placeholder="输入消息">
+            </div>
 
-    <label for="message">消息：</label>
-    <input type="text" id="message" placeholder="输入消息">
+            <button class="submitButton" onclick="sendMessage()">🍌 发送 🍌</button>
+        </div>
 
-    <button onclick="sendMessage()">发送</button>
 
-    <div id="messageBox"
-        style="border: 1px solid #ccc; padding: 10px; margin-top: 10px; max-height: 200px; min-height: 20px;overflow-y: auto;">
-    </div>
+        <div id="messageBox"></div>
 
-    <script>
-        const randomClientId = 'client_' + Math.random().toString(36).substr(2, 9);
+        <script>
+            const randomClientId = 'client_' + Math.random().toString(36).substr(2, 9);
 
-        const options = {
-            clean: true,
-            connectTimeout: 4000,
-            clientId: randomClientId,
-            username: '$SECRET_UI_MQTT_USERNAME',
-            password: '$SECRET_UI_MQTT_PASSWORD'
-        }
-
-        const connectUrl = '$SECRET_UI_MQTT_URL'
-        const client = mqtt.connect(connectUrl, options)
-
-        client.on('reconnect', (error) => {
-            console.log('正在重连:', error)
-        })
-
-        client.on('error', (error) => {
-            console.log('连接失败:', error)
-        })
-
-        client.on('message', (topic, message) => {
-            console.log('收到消息：', topic, message.toString())
-            displayMessage(topic, message.toString())
-        })
-
-        function sendMessage() {
-            const sender = document.getElementById('sender').value;
-            const message = document.getElementById('message').value;
-
-            if (sender && message) {
-                const topic = `malou/${sender}`;
-                client.publish(topic, message);
-                displayMessage(sender, message);
-            } else {
-                alert('请输入发送人和消息');
+            const options = {
+                clean: true,
+                connectTimeout: 4000,
+                clientId: randomClientId,
+                username: '$SECRET_UI_MQTT_USERNAME',
+                password: '$SECRET_UI_MQTT_PASSWORD'
             }
-        }
 
-        function displayMessage(sender, message) {
-            const messageBox = document.getElementById('messageBox');
-            const newMessage = document.createElement('p');
-            newMessage.textContent = `${sender}: ${message}`;
-            messageBox.appendChild(newMessage);
-            // 滚动到底部
-            messageBox.scrollTop = messageBox.scrollHeight;
-        }
-    </script>
+            const connectUrl = '$SECRET_UI_MQTT_URL'
+            const client = mqtt.connect(connectUrl, options)
 
+            client.on('reconnect', (error) => {
+                console.log('正在重连:', error)
+            })
+
+            client.on('error', (error) => {
+                console.log('连接失败:', error)
+            })
+
+            client.on('message', (topic, message) => {
+                console.log('收到消息：', topic, message.toString())
+                displayMessage(topic, message.toString())
+            })
+
+            function sendMessage() {
+                const sender = document.getElementById('sender').value;
+                const message = document.getElementById('message').value;
+
+                if (sender && message) {
+                    const topic = `malou/${sender}`;
+                    client.publish(topic, message);
+                    displayMessage(sender, message);
+                } else {
+                    alert('请输入发送人和消息');
+                }
+            }
+
+            function displayMessage(sender, message) {
+                const messageBox = document.getElementById('messageBox');
+                const newMessage = document.createElement('p');
+                newMessage.textContent = `${sender}: ${message}`;
+                messageBox.appendChild(newMessage);
+                // 滚动到底部
+                messageBox.scrollTop = messageBox.scrollHeight;
+            }
+        </script>
+    </div>
 </body>
 
 </html>
